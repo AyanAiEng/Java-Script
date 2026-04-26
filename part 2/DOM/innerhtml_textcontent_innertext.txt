@@ -1,0 +1,12 @@
+🔹 1. Visibility
+textContent → shows all text (hidden + visible)
+innerText → shows only visible text
+innerHTML → shows HTML + text
+🔹 2. HTML Handling
+textContent → ❌ ignores HTML tags
+innerText → ❌ ignores HTML tags
+innerHTML → ✅ reads & writes HTML
+🔹 3. Performance & Use
+textContent → ⚡ fastest (best default)
+innerText → 🐢 slower (uses layout/CSS)
+innerHTML → ⚠️ flexible but can be unsafe (XSS risk)

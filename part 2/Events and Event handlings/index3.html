@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /*        *{
+            margin: 0;
+            padding: 0;
+        }
+        .main {
+            width: 450px;
+            height: 450px;
+            position: absolute;
+            background-color: black;
+        }
+        html, body{
+            width: 100%;
+            height: 100%;
+        } */
+    </style>
+</head>
+
+<body>
+
+    <!--     <div class="main"></div>
+ -->
+    <input type="text" id="search" placeholder="Search fruit..." />
+
+    <ul id="list">
+        <li>Apple</li>
+        <li>Banana</li>
+        <li>Mango</li>
+        <li>Orange</li>
+    </ul>
+
+    <p id="result"></p>
+
+    <script>
+        let search = document.querySelector("#search");
+        let items = document.querySelectorAll("#list li");
+        let result = document.querySelector("#result");
+
+        // 🔹 SEARCH (keyup)
+        search.addEventListener("keyup", function () {
+            let value = search.value.toLowerCase();
+
+            items.forEach(function (item) {
+                if (item.innerText.toLowerCase().includes(value)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        });
+
+        // 🔹 SELECT (click)
+        items.forEach(function (item) {
+            item.addEventListener("click", function () {
+                result.innerText = "You selected: " + item.innerText;
+                search.value = item.innerText; // input me bhi aa jaye
+            });
+        });
+    </script>
+    <script src="script3.js"></script>
+</body>
+
+</html>

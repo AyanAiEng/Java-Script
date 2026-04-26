@@ -1,0 +1,420 @@
+================================================================
+        THE 'this' KEYWORD IN JAVASCRIPT — DEEP GUIDE
+================================================================
+
+WHAT IS 'this'?
+---------------
+In JavaScript, 'this' is a special keyword that automatically refers to
+an OBJECT. But which object it refers to is NOT fixed — it changes
+depending on HOW and WHERE the function is called (not where it is written).
+
+Think of 'this' as a pronoun. When someone says "I am hungry", the word
+"I" refers to whoever is speaking. Similarly, 'this' refers to whoever
+is calling the function — the context of execution.
+
+The golden rule: 'this' is determined at RUNTIME, not at definition time.
+(Exception: arrow functions, which capture 'this' at definition time.)
+
+
+================================================================
+  RULE 1 — GLOBAL CONTEXT (outside any function)
+================================================================
+
+When you use 'this' at the top level of your script, it refers to the
+GLOBAL OBJECT.
+
+In a browser  → this === window
+In Node.js    → this === global (or {} in ES modules)
+
+EXAMPLE 1:
+----------
+console.log(this); // In browser: Window {…}
+
+EXAMPLE 2:
+----------
+var name = "Alice";
+console.log(this.name); // "Alice" — because var attaches to window
+
+EXAMPLE 3:
+----------
+// Node.js global
+this.city = "Karachi";
+console.log(global.city); // "Karachi"
+
+
+================================================================
+  RULE 2 — REGULAR FUNCTION CALL (non-strict mode)
+================================================================
+
+When a regular function is called WITHOUT an object in front of it,
+'this' defaults to the GLOBAL OBJECT (window in browsers).
+
+EXAMPLE 4:
+----------
+function greet() {
+    console.log(this); // window (in browser)
+}
+greet();
+
+EXAMPLE 5:
+----------
+function showCity() {
+    console.log(this.city); // reads from window.city
+}
+var city = "Lahore";
+showCity(); // "Lahore"
+
+EXAMPLE 6:
+----------
+function Person() {
+    this.name = "Bilal";
+    console.log(this.name);
+}
+Person(); // "Bilal" — but 'this' here is window! Pollutes global scope.
+
+
+================================================================
+  RULE 3 — REGULAR FUNCTION CALL (strict mode)
+================================================================
+
+With "use strict" at the top, 'this' in a regular function call is
+UNDEFINED instead of the global object. This prevents accidental
+global pollution.
+
+EXAMPLE 7:
+----------
+"use strict";
+function greet() {
+    console.log(this); // undefined
+}
+greet();
+
+EXAMPLE 8:
+----------
+"use strict";
+function showAge() {
+    console.log(this.age); // TypeError: Cannot read properties of undefined
+}
+showAge();
+
+EXAMPLE 9:
+----------
+"use strict";
+function safe() {
+    if (this === undefined) {
+        console.log("No context — called without an object");
+    }
+}
+safe(); // "No context — called without an object"
+
+
+================================================================
+  RULE 4 — METHOD CALL (function inside an object)
+================================================================
+
+When a function is called as a METHOD of an object (object.method()),
+'this' refers to THAT OBJECT — the one before the dot.
+
+EXAMPLE 10:
+-----------
+const user = {
+    name: "Sara",
+    greet: function() {
+        console.log("Hello, " + this.name);
+    }
+};
+user.greet(); // "Hello, Sara" — this = user
+
+EXAMPLE 11:
+-----------
+const car = {
+    brand: "Toyota",
+    speed: 0,
+    accelerate: function() {
+        this.speed += 20;
+        console.log(this.brand + " is going " + this.speed + " km/h");
+    }
+};
+car.accelerate(); // "Toyota is going 20 km/h"
+car.accelerate(); // "Toyota is going 40 km/h"
+
+EXAMPLE 12:
+-----------
+const account = {
+    balance: 1000,
+    deposit: function(amount) {
+        this.balance += amount;
+        return this; // returns the object — allows chaining
+    },
+    withdraw: function(amount) {
+        this.balance -= amount;
+        return this;
+    },
+    show: function() {
+        console.log("Balance: " + this.balance);
+        return this;
+    }
+};
+account.deposit(500).withdraw(200).show(); // "Balance: 1300"
+
+EXAMPLE 13:
+-----------
+const obj1 = { val: 10, getVal: function() { return this.val; } };
+const obj2 = { val: 99, getVal: obj1.getVal }; // same function, different owner
+
+console.log(obj1.getVal()); // 10
+console.log(obj2.getVal()); // 99 — this changes based on who calls it!
+
+
+================================================================
+  RULE 5 — CONSTRUCTOR FUNCTION (using 'new')
+================================================================
+
+When a function is called with the 'new' keyword, JavaScript:
+  1. Creates a brand new empty object {}
+  2. Sets 'this' to point to that new object
+  3. Runs the function body (which adds properties to 'this')
+  4. Returns 'this' automatically
+
+EXAMPLE 14:
+-----------
+function Dog(name, breed) {
+    this.name = name;
+    this.breed = breed;
+    this.bark = function() {
+        console.log(this.name + " says: Woof!");
+    };
+}
+const dog1 = new Dog("Rex", "Labrador");
+const dog2 = new Dog("Max", "Poodle");
+
+dog1.bark(); // "Rex says: Woof!"
+dog2.bark(); // "Max says: Woof!"
+
+EXAMPLE 15:
+-----------
+function Counter(start) {
+    this.count = start || 0;
+    this.increment = function() { this.count++; };
+    this.decrement = function() { this.count--; };
+    this.value = function() { return this.count; };
+}
+const c = new Counter(10);
+c.increment();
+c.increment();
+c.decrement();
+console.log(c.value()); // 11
+
+EXAMPLE 16:
+-----------
+function Car(make, year) {
+    this.make = make;
+    this.year = year;
+}
+const myCar = new Car("Honda", 2022);
+console.log(myCar.make); // "Honda"
+console.log(myCar.year); // 2022
+
+
+================================================================
+  RULE 6 — ARROW FUNCTIONS (lexical 'this')
+================================================================
+
+Arrow functions do NOT have their own 'this'. Instead, they INHERIT
+'this' from the surrounding (lexical) scope where they were DEFINED.
+This is called "lexical binding" or "captured this".
+
+EXAMPLE 17 — Problem with regular function:
+-------------------------------------------
+const timer = {
+    name: "My Timer",
+    start: function() {
+        setTimeout(function() {
+            console.log(this.name); // undefined! 'this' = window here
+        }, 1000);
+    }
+};
+timer.start();
+
+EXAMPLE 18 — Fixed with arrow function:
+----------------------------------------
+const timer2 = {
+    name: "My Timer",
+    start: function() {
+        setTimeout(() => {
+            console.log(this.name); // "My Timer" — arrow captures outer 'this'
+        }, 1000);
+    }
+};
+timer2.start(); // "My Timer"
+
+EXAMPLE 19:
+-----------
+function Counter() {
+    this.count = 0;
+    setInterval(() => {
+        this.count++; // 'this' = Counter instance, thanks to arrow function
+        console.log(this.count);
+    }, 1000);
+}
+const c = new Counter(); // prints 1, 2, 3, 4... every second
+
+EXAMPLE 20:
+-----------
+const obj = {
+    value: 42,
+    regular: function() { return this.value; },   // this = obj → 42
+    arrow: () => { return this.value; }            // this = window → undefined
+};
+console.log(obj.regular()); // 42
+console.log(obj.arrow());   // undefined
+
+
+================================================================
+  RULE 7 — call(), apply(), and bind() — EXPLICIT BINDING
+================================================================
+
+These three methods let YOU manually decide what 'this' will be.
+
+call()  → calls the function immediately with a specific 'this'
+apply() → same as call(), but passes arguments as an ARRAY
+bind()  → returns a NEW function with 'this' permanently fixed
+
+EXAMPLE 21 — call():
+---------------------
+function introduce(greeting) {
+    console.log(greeting + ", I am " + this.name);
+}
+const person = { name: "Ali" };
+introduce.call(person, "Hello"); // "Hello, I am Ali"
+
+EXAMPLE 22 — apply():
+----------------------
+function sum(a, b, c) {
+    console.log(this.label + ": " + (a + b + c));
+}
+const ctx = { label: "Total" };
+sum.apply(ctx, [10, 20, 30]); // "Total: 60"
+
+EXAMPLE 23 — bind():
+---------------------
+function greet() {
+    console.log("Hi, " + this.name);
+}
+const user = { name: "Zara" };
+const boundGreet = greet.bind(user); // fixes 'this' to user forever
+boundGreet();           // "Hi, Zara"
+boundGreet();           // "Hi, Zara" — always the same
+setTimeout(boundGreet, 1000); // still "Hi, Zara"
+
+EXAMPLE 24 — bind() with partial application:
+----------------------------------------------
+function multiply(multiplier, value) {
+    return this.base * multiplier * value;
+}
+const calc = { base: 2 };
+const double = multiply.bind(calc, 2);  // multiplier is pre-set to 2
+console.log(double(5));  // 2 * 2 * 5 = 20
+console.log(double(10)); // 2 * 2 * 10 = 40
+
+EXAMPLE 25 — call() to borrow methods:
+----------------------------------------
+const arrayLike = { 0: "apple", 1: "banana", length: 2 };
+const fruits = Array.prototype.slice.call(arrayLike);
+console.log(fruits); // ["apple", "banana"]
+
+
+================================================================
+  RULE 8 — CLASS SYNTAX (ES6+)
+================================================================
+
+In ES6 classes, 'this' inside methods refers to the INSTANCE
+(the object created with 'new'), just like constructor functions.
+
+EXAMPLE 26:
+-----------
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    speak() {
+        console.log(this.name + " makes a sound.");
+    }
+}
+const cat = new Animal("Whiskers");
+cat.speak(); // "Whiskers makes a sound."
+
+EXAMPLE 27:
+-----------
+class BankAccount {
+    constructor(owner, balance) {
+        this.owner = owner;
+        this.balance = balance;
+    }
+    deposit(amount) {
+        this.balance += amount;
+        console.log(`${this.owner}: +${amount} → ${this.balance}`);
+    }
+}
+const acc = new BankAccount("Hassan", 5000);
+acc.deposit(1000); // "Hassan: +1000 → 6000"
+
+
+================================================================
+  RULE 9 — EVENT HANDLERS
+================================================================
+
+In DOM event handlers, 'this' usually refers to the HTML ELEMENT
+that triggered the event.
+
+EXAMPLE 28:
+-----------
+document.querySelector("button").addEventListener("click", function() {
+    console.log(this); // <button> element
+    this.style.color = "red"; // changes the button's color
+});
+
+EXAMPLE 29 — Arrow function in event handler (different behavior):
+-------------------------------------------------------------------
+document.querySelector("button").addEventListener("click", () => {
+    console.log(this); // window — NOT the button! Arrow inherits outer 'this'
+});
+
+EXAMPLE 30:
+-----------
+class ToggleButton {
+    constructor(element) {
+        this.on = false;
+        this.element = element;
+        // bind is needed to keep 'this' pointing to the class instance
+        this.element.addEventListener("click", this.toggle.bind(this));
+    }
+    toggle() {
+        this.on = !this.on;
+        console.log("Button is: " + (this.on ? "ON" : "OFF"));
+    }
+}
+
+
+================================================================
+  QUICK SUMMARY TABLE
+================================================================
+
+CONTEXT                          | what 'this' equals
+---------------------------------|-----------------------------
+Global scope (browser)           | window
+Global scope (Node.js)           | global / {}
+Regular function (non-strict)    | window / global
+Regular function (strict mode)   | undefined
+Method (object.method())         | the object before the dot
+Constructor (new Function())      | the newly created object
+Arrow function                   | inherited from outer scope
+call() / apply()                 | first argument you pass
+bind()                           | first argument, permanently
+DOM event (regular function)     | the HTML element
+DOM event (arrow function)       | outer 'this' (usually window)
+Class method                     | the class instance
+
+================================================================
+END OF FILE: this keyword.txt
+================================================================
