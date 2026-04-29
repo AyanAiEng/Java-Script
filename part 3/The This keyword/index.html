@@ -1,19 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>g
-    <!-- <script src="this_keyword.js"></script> 
-     -->
-    <h1>Hey</h1>
-<!--     <script src="uses_of_this_keyword.js"></script>
-<script src="confusing_this_keyword.js"></script>
 
-<script src="arrow_fucntion_and_lexical_scoping_with_this_keyword.js"></script>
--->
-    <script src="call, apply, bind.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add User UI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <form>
+    <div class="container">
+      <h2>Add User</h2>
+
+      <div class="input-group">
+        <label>Name</label>
+        <input type="text" id="name" />
+      </div>
+
+      <div class="input-group">
+        <label>Role</label>
+        <input type="text" id="role" />
+      </div>
+
+      <div class="input-group">
+        <label>Bio</label>
+        <textarea id="bio"></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Photo URL</label>
+        <input type="text" id="photo" />
+      </div>
+
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+
+  <div class="cards">
+    <div class="card"> <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+      <h3>John Doe</h3>
+      <p>Frontend Developer</p>
+      <p>Loves building beautiful UIs and learning new technologies.</p>
+    </div>
+    <div class="card"> <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+      <h3>Jane Smith</h3>
+      <p>Backend Engineer</p>
+      <p>Enjoys solving complex problems and optimizing APIs.</p>
+    </div>
+    <div class="card"> <img src="https://randomuser.me/api/portraits/men/76.jpg" alt="">
+      <h3>Alex Lee</h3>
+      <p>UI/UX Designer</p>
+      <p>Passionate about user experience and clean design.</p>
+    </div>
+  </div>
+
+  <script src="this keyword_practice.js"></script>
 </body>
+
 </html>
