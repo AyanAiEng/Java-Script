@@ -1,0 +1,3 @@
+# Difference Between JSON Text and JavaScript Object
+
+When an API sends data over the internet, it sends it as JSON text, which is just a string in a standardized format, not a real JavaScript object that JS can directly use. A JavaScript object is an actual usable data structure where you can access properties and manipulate data, but JSON is only a text representation of that object used for transferring data between systems. So when `fetch()` gets a response, the data is still in JSON text form inside the response body, and `response.json()` converts that JSON text into a real JavaScript object or array so your program can actually use, display, loop through, or manipulate the data on the UI.
